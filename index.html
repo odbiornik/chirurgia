@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Pepemago 2026</title>
+    <style>
+        
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            line-height: 1.6; padding: 20px; background-color: transparent; color: #333; 
+            margin: 0; height: 100vh; display: flex; align-items: center; justify-content: center;
+        }
+        #lock-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: transparent;
+            display: flex; align-items: center; justify-content: center; z-index: 10000;
+        }
+        .lock-box {
+            background: white;
+            padding: 40px; border-radius: 15px;
+            text-align: center; color: #2c3e50; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+            border: 2px solid #3498db;
+            width: 320px;
+        }
+        .lock-box h1 { color: #2c3e50; margin: 0 0 10px 0; font-size: 1.8em; }
+        .lock-box p { color: #7f8c8d; margin-bottom: 20px; font-size: 0.9em; }
+        .lock-box input { 
+            padding: 12px; border-radius: 5px; border: 1px solid #ccc; 
+            width: 100%; margin-bottom: 15px; box-sizing: border-box; font-size: 1em;
+            outline: none;
+        }
+        .lock-box button { 
+            padding: 12px; background: #3498db; color: white; border: none; 
+            border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; 
+            transition: background 0.3s;
+        }
+        .lock-box button:hover { background-color: #2980b9; }
+    </style>
+</head>
+<body>
+
+<div id="lock-screen">
+    <div class="lock-box">
+        <h1>Pepemago 2026</h1>
+        <p>System wymaga autoryzacji</p>
+        <input type="password" id="pass_input" placeholder="Wpisz hasło...">
+        <button onclick="unlock()">WEJDŹ DO SYSTEMU</button>
+        <div id="err-msg" style="color:red; display:none; margin-top:10px; font-size:0.8em;">Hasło nieprawidłowe</div>
+    </div>
+</div>
+
+<script>
+     
+
+
+
+
+
+
+
+
+
+   const encryptedPayload = "";
+
+
+
+
+
+
+
+
+
+
+
+    async function unlock() {
+        const passwordField = document.getElementById('pass_input');
+        const password = passwordField.value;
+        const error = document.getElementById('err-msg');
+
+        try {
+            const encoder = new TextEncoder();
+            const decoder = new TextDecoder();
+            
+            // Generowanie klucza SHA-256
+            const pwHash = await crypto.subtle.digest('SHA-256', encoder.encode(password));
+            const key = await crypto.subtle.importKey('raw', pwHash, { name: 'AES-GCM' }, false, ['decrypt']);
+
+            // Parsowanie danych
+            const combined = Uint8Array.from(atob(encryptedPayload), c => c.charCodeAt(0));
+            const iv = combined.slice(0, 12);
+            const data = combined.slice(12);
+
+            // Próba deszyfrowania
+            const decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: iv }, key, data);
+            
+            // Sukces: wstrzyknięcie kodu
+            document.open();
+            document.write(decoder.decode(decrypted));
+            document.close();
+
+        } catch (e) {
+            // Błąd: identyczne zachowanie jak w oryginale
+            error.style.display = 'block';
+            passwordField.value = "";
+        }
+    }
+
+    // Obsługa Entera
+    document.getElementById('pass_input').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') unlock();
+    });
+</script>
+
+</body>
+</html>
